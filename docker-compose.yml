@@ -1,0 +1,47 @@
+version: '3.1'
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/home/api
+      - /home/api/node_modules
+    env_file: '.env'
+    container_name: vehicles_api
+    links: 
+    - db
+    depends_on: 
+    - db
+  
+  frontend:
+    build: ../vehicle-catalog-ui
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../vehicle-catalog-ui:/home/ui
+      - /home/ui/node_modules
+    container_name: vehicles_ui
+    links: 
+    - backend
+    depends_on: 
+    - backend
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=homestead"
+      - "MYSQL_USER=homestead"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_ROOT_PASSWORD=secret"
+      - "MYSQL_PORT=3306"
+    ports:
+    - "3306:3306"
+    container_name: vehicles_db
+
+volumes: 
+  dbdata:
